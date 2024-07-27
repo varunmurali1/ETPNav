@@ -29,7 +29,9 @@ def calculate_vp_rel_pos_fts(a, b, base_heading=0, base_elevation=0, to_clock=Fa
 
     # the simulator's api is weired (x-y axis is transposed)
     # heading = np.arcsin(dx/xy_dist) # [-pi/2, pi/2]
-    heading = np.arcsin(-dx / xz_dist)  # [-pi/2, pi/2]
+    arg = -dx/xz_dist
+    arg = max(min(arg, 0.999), -0.999)
+    heading = np.arcsin(arg)  # [-pi/2, pi/2]
     # if b[1] < a[1]:
     #     heading = np.pi - heading
     if b[2] > a[2]:
@@ -37,8 +39,10 @@ def calculate_vp_rel_pos_fts(a, b, base_heading=0, base_elevation=0, to_clock=Fa
     heading -= base_heading
     if to_clock:
         heading = 2 * np.pi - heading
-
-    elevation = np.arcsin(dz / xyz_dist)  # [-pi/2, pi/2]
+    
+    arg = dz/xyz_dist
+    arg = max(min(arg, 0.999), -0.999)
+    elevation = np.arcsin(arg)  # [-pi/2, pi/2]
     elevation -= base_elevation
 
     return heading, elevation, xyz_dist

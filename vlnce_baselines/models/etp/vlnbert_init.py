@@ -20,6 +20,7 @@ def get_vlnbert_models(config=None):
     model_name_or_path = config.pretrained_path
     new_ckpt_weights = {}
     if model_name_or_path is not None:
+        print(model_name_or_path)
         ckpt_weights = torch.load(model_name_or_path, map_location='cpu')
         for k, v in ckpt_weights.items():
             if k.startswith('module'):

@@ -9,6 +9,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from .distributed import init_distributed
 from .logger import LOGGER
 
+import os
 
 def set_random_seed(seed):
     random.seed(seed)
@@ -28,15 +29,16 @@ def set_cuda(opts) -> Tuple[bool, int, torch.device]:
     """
     Initialize CUDA for distributed computing
     """
+    local_rank = int(os.environ.get("LOCAL_RANK"))
     if not torch.cuda.is_available():
-        assert opts.local_rank == -1, opts.local_rank
+        assert local_rank == -1, local_rank
         return True, 0, torch.device("cpu")
 
     # get device settings
-    if opts.local_rank != -1:
+    if local_rank != -1:
         init_distributed(opts)
-        torch.cuda.set_device(opts.local_rank)
-        device = torch.device("cuda", opts.local_rank)
+        torch.cuda.set_device(local_rank)
+        device = torch.device("cuda", local_rank)
         n_gpu = 1
         default_gpu = dist.get_rank() == 0
         if default_gpu:

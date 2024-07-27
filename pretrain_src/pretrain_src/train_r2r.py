@@ -34,7 +34,7 @@ from data.tasks import (
     SapDataset, sap_collate)
 
 from model.pretrain_cmt import GlocalTextPathCMTPreTraining
-
+from  torch.distributed.elastic.multiprocessing.errors import record
 
 def create_dataloaders(
     data_cfg, nav_db, tok, is_train: bool, device: torch.device, opts
@@ -66,19 +66,20 @@ def create_dataloaders(
             dataloaders[task_name] = PrefetchLoader(task_loader, device)
     return dataloaders
 
-
+@record
 def main(opts):
     default_gpu, n_gpu, device = set_cuda(opts)
+    local_rank = int(os.environ["LOCAL_RANK"])
 
     if default_gpu:
         LOGGER.info(
             'device: {} n_gpu: {}, distributed training: {}, 16-bits training: {}'.format(
-                device, n_gpu, bool(opts.local_rank != -1), opts.fp16
+                device, n_gpu, bool(local_rank != -1), opts.fp16
             )
         )
- 
+
     seed = opts.seed
-    if opts.local_rank != -1:
+    if local_rank != -1:
         seed += opts.rank
     set_random_seed(seed)
 
@@ -148,7 +149,7 @@ def main(opts):
     )
     model.train()
     set_dropout(model, opts.dropout)
-    model = wrap_model(model, device, opts.local_rank)
+    model = wrap_model(model, device, local_rank)
     del checkpoint
     
     # load data training set
@@ -197,7 +198,7 @@ def main(opts):
     meta_loader = MetaLoader(
         train_dataloaders,
         accum_steps=opts.gradient_accumulation_steps,
-        distributed=opts.local_rank != -1,
+        #distributed=local_rank != -1,
         device=device
     )
     meta_loader = PrefetchLoader(meta_loader, device)
@@ -211,7 +212,7 @@ def main(opts):
 
     global_step = 0
     LOGGER.info(f"***** Running training with {opts.world_size} GPUs *****")
-    LOGGER.info("  Batch size = %d", opts.train_batch_size if opts.local_rank == -1 else opts.train_batch_size * opts.world_size)
+    LOGGER.info("  Batch size = %d", opts.train_batch_size if local_rank == -1 else opts.train_batch_size * opts.world_size)
     LOGGER.info("  Accumulate steps = %d", opts.gradient_accumulation_steps)
     LOGGER.info("  Num steps = %d", opts.num_train_steps)
 

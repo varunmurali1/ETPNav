@@ -155,6 +155,7 @@ class RxRVLNCEDatasetV1(Dataset):
     @classmethod
     def get_scenes_to_load(cls, config: Config) -> List[str]:
         r"""Return a sorted list of scenes"""
+        print(config)
         assert cls.check_config_paths_exist(config)
         dataset = cls(config)
         return sorted(

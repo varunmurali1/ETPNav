@@ -9,6 +9,7 @@ TENSORBOARD_DIR: data/logs/tensorboard_dirs/
 CHECKPOINT_FOLDER: data/logs/checkpoints/
 EVAL_CKPT_PATH_DIR: data/logs/checkpoints/
 RESULTS_DIR: data/logs/eval_results/
+VIDEO_OPTION: ["disk"]
 VIDEO_DIR: data/logs/video/
 
 INFERENCE:

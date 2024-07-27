@@ -104,13 +104,6 @@ def load_parser():
     )
     parser.add_argument("--pin_mem", action="store_true", help="pin memory")
 
-    # distributed computing
-    parser.add_argument(
-        "--local_rank",
-        type=int,
-        default=-1,
-        help="local rank for distributed training on gpus",
-    )
     parser.add_argument(
         "--node_rank",
         type=int,

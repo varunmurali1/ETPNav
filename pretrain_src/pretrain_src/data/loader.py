@@ -129,7 +129,9 @@ def build_dataloader(task, dataset, collate_fn, is_train: bool, opts):
     batch_size = opts.train_batch_size if is_train else opts.val_batch_size
     # if task == 'itm': batch_size = max(1, batch_size // 2)
 
-    if opts.local_rank == -1:
+    import os 
+    local_rank = int(os.environ.get("LOCAL_RANK"))
+    if local_rank == -1:
         if is_train:
             sampler: Union[
                 RandomSampler, SequentialSampler, DistributedSampler

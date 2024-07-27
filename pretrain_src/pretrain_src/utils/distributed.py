@@ -43,13 +43,7 @@ def load_init_param(opts):
         else:
             raise RuntimeError("Can't find any rank or node rank")
 
-        if opts.local_rank != -1:
-            local_rank = opts.local_rank
-        elif os.environ.get("LOCAL_RANK", "") != "":
-            local_rank = int(os.environ["LOCAL_RANK"])
-        else:
-            raise RuntimeError("Can't find any rank or local rank")
-
+        local_rank = int(os.environ["LOCAL_RANK"])
         # WARNING: this assumes that each node has the same number of GPUs
         n_gpus = torch.cuda.device_count()
         rank = local_rank + node_rank * n_gpus
@@ -73,7 +67,7 @@ def init_distributed(opts):
 
 
 def is_default_gpu(opts) -> bool:
-    return opts.local_rank == -1 or dist.get_rank() == 0
+    return os.environ.get("LOCAL_RANK") 
 
 
 def is_dist_avail_and_initialized():
