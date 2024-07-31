@@ -16,6 +16,7 @@ import copy
 from PIL import Image
 import time
 from progressbar import ProgressBar
+from transformers import Dinov2Backbone, AutoImageProcessor
 
 import torch
 import torch.nn.functional as F
@@ -51,8 +52,11 @@ def process_features(proc_id, out_queue, scanvp_list, args):
 
     # Set up PyTorch CNN model
     torch.set_grad_enabled(False)
-    model, img_transforms, device = build_feature_extractor(args.model_name, args.checkpoint_file)
+    #model, img_transforms, device = build_feature_extractor(args.model_name, args.checkpoint_file)
+    model = Dinov2Backbone.from_pretrained("facebook/dinov2-large").cuda().eval()
+    image_processor = AutoImageProcessor.from_pretrained("facebook/dinov2-large") # I think this just crops, we may need some other processing on the image size (multiple of patch size 14)
 
+    device = 'cuda'
     with h5py.File(args.img_db, 'r') as f:
         for scan_id, viewpoint_id in scanvp_list:
             data = f[f'{scan_id}_{viewpoint_id}'][...].astype('uint8')
@@ -62,10 +66,13 @@ def process_features(proc_id, out_queue, scanvp_list, args):
                 image = Image.fromarray(image[:, :, ::-1]) #cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 images.append(image)
 
-            images = torch.stack([img_transforms(image) for image in images], 0).to(device)
+            #images = torch.stack([img_transforms(image) for image in images], 0).to(device)
+            images = np.asarray(images)
+            images = image_processor(images, return_tensors='pt')['pixel_values'].to(device)
             fts, logits = [], []
             for k in range(0, len(images), args.batch_size):
-                b_fts = model.encode_image(images[k: k+args.batch_size])
+                #b_fts = model.encode_image(images[k: k+args.batch_size])
+                b_fts = model(images[k: k+args.batch_size]).feature_maps[-1]
                 if b_fts.dim() == 4:
                     b_fts = b_fts.mean((2,3))
                 assert b_fts.dim() == 2
@@ -140,7 +147,7 @@ if __name__ == '__main__':
     parser.add_argument('--connectivity_dir', default='precompute_img_features/connectivity')
     parser.add_argument('--img_db', default='pretrain_src/img_features/habitat_256x256_vfov60_bgr.hdf5')
     parser.add_argument('--out_image_logits', action='store_true', default=False)
-    parser.add_argument('--output_file', default='pretrain_src/img_features/CLIP-ViT-B-32-views-habitat.hdf5')
+    parser.add_argument('--output_file', default='pretrain_src/img_features/Dinov2-views-habitat.hdf5')
     parser.add_argument('--batch_size', default=36, type=int)
     parser.add_argument('--num_workers', type=int, default=1)
     args = parser.parse_args()

@@ -12,7 +12,7 @@ import argparse
 import cv2
 # change to your Matterport3DSimulator path, build in cpu mode
 # https://github.com/peteanderson80/Matterport3DSimulator
-sys.path.insert(0, '/home/dongan/workspace/lib/Matterport3DSimulator/build')
+#sys.path.insert(0, '/home/dongan/workspace/lib/Matterport3DSimulator/build')
 import MatterSim
 from habitat_utils import HabitatUtils
 from scipy.spatial.transform import Rotation as R

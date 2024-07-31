@@ -5,7 +5,7 @@ export CUDA_VISIBLE_DEVICES=0
 # mkdir build && cd build
 # cmake -DOSMESA_RENDERING=ON ..
 # make
-export PYTHONPATH=Matterport3DSimulator/build:$PYTHONPATH
+export PYTHONPATH=/data/Matterport3DSimulator/build:$PYTHONPATH
 
 python precompute_img_features/save_img.py --img_type rgb
 python precompute_img_features/save_img.py --img_type depth
