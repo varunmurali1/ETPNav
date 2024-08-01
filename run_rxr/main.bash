@@ -4,9 +4,9 @@ export MAGNUM_LOG=quiet
 flag1="--exp_name release_rxr
       --run-type train
       --exp-config run_rxr/iter_train.yaml
-      SIMULATOR_GPU_IDS [0,1,2,3]
-      TORCH_GPU_IDS [0,1,2,3]
-      GPU_NUMBERS 4
+      SIMULATOR_GPU_IDS [0]
+      TORCH_GPU_IDS [0]
+      GPU_NUMBERS 1
       NUM_ENVIRONMENTS 8
       IL.iters 20000
       IL.lr 1.5e-5
@@ -18,7 +18,7 @@ flag1="--exp_name release_rxr
       IL.is_requeue True
       IL.waypoint_aug  True
       TASK_CONFIG.SIMULATOR.HABITAT_SIM_V0.ALLOW_SLIDING True
-      MODEL.pretrained_path pretrained/ETP/mlm.sap_rxr/ckpts/model_step_90000.pt
+      MODEL.pretrained_path pretrained/rxr_ce/mlm.sap_habitat_depth/ckpts/model_step_97500.pt
       IL.expert_policy ndtw
       "
 
@@ -51,7 +51,7 @@ mode=$1
 case $mode in 
       train)
       echo "###### train mode ######"
-      python -m torch.distributed.launch --nproc_per_node=4 --master_port $2 run.py $flag1
+      torchrun --nproc_per_node=1 --master_port $2 run.py $flag1
       ;;
       eval)
       echo "###### eval mode ######"

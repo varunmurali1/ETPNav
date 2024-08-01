@@ -14,5 +14,4 @@ def get_vlnbert_models(config=None):
     vis_config.vl_layers = 4
     vis_config.la_layers = 9
     visual_model = model_class.from_pretrained(model_name_or_path, config=vis_config)
-
     return visual_model

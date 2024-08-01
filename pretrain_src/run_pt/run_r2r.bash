@@ -1,7 +1,7 @@
 
 NODE_RANK=0
 NUM_GPUS=1
-outdir=pretrained/r2r_ce/mlm.sap_habitat_depth
+outdir=pretrained/rxr_ce/mlm.sap_habitat_depth
 
 # train
 torchrun \

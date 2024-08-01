@@ -20,7 +20,6 @@ def get_vlnbert_models(config=None):
     model_name_or_path = config.pretrained_path
     new_ckpt_weights = {}
     if model_name_or_path is not None:
-        print(model_name_or_path)
         ckpt_weights = torch.load(model_name_or_path, map_location='cpu')
         for k, v in ckpt_weights.items():
             if k.startswith('module'):
@@ -40,7 +39,7 @@ def get_vlnbert_models(config=None):
         vis_config.type_vocab_size = 2
 
     vis_config.max_action_steps = 100
-    vis_config.image_feat_size = 512
+    vis_config.image_feat_size = 1024
     vis_config.use_depth_embedding = config.use_depth_embedding
     vis_config.depth_feat_size = 128
     vis_config.angle_feat_size = 4

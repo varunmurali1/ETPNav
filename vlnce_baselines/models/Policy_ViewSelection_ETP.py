@@ -89,6 +89,7 @@ class ETP(Net):
         self.device = device
 
         print('\nInitalizing the ETP model ...')
+        print(model_config)
         self.vln_bert = get_vlnbert_models(config=model_config)
         # if model_config.task_type == 'r2r':
         #     self.rgb_projection = nn.Linear(2048, 768)
@@ -200,7 +201,7 @@ class ETP(Net):
 
             # reverse the order of images back to counter-clockwise
             rgb_embed_reshape = rgb_embedding.reshape(
-                batch_size, NUM_IMGS, 512, 1, 1)
+                batch_size, NUM_IMGS, 1024, 16, 16)
             depth_embed_reshape = depth_embedding.reshape(
                 batch_size, NUM_IMGS, 128, 4, 4)
             rgb_feats = torch.cat((

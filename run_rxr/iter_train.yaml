@@ -9,7 +9,7 @@ TENSORBOARD_DIR: data/logs/tensorboard_dirs/
 CHECKPOINT_FOLDER: data/logs/checkpoints/
 EVAL_CKPT_PATH_DIR: data/logs/checkpoints/
 RESULTS_DIR: data/logs/eval_results/
-VIDEO_OPTION: ["disk"]
+VIDEO_OPTION: []
 VIDEO_DIR: data/logs/video/
 
 INFERENCE:
@@ -39,7 +39,7 @@ IL:
   iters: 15000
   log_every: 200
   lr: 1e-5
-  batch_size: 1 # equal to NUM_ENVIRONMENTS
+  batch_size: 8 # equal to NUM_ENVIRONMENTS
   ml_weight: 1.0
   expert_policy: ndtw
 
@@ -60,7 +60,7 @@ MODEL:
 
   policy_name: PolicyViewSelectionETP
   NUM_ANGLES: 12
-  pretrained_path: pretrained/ETP/mlm.sap_rxr/ckpts/model_step_90000.pt
+  pretrained_path: pretrained/r2r_ce/mlm.sap_habitat_depth/ckpts/model_step_97500.pt
   fix_lang_embedding: False
   fix_pano_embedding: False
   use_depth_embedding: True
@@ -70,7 +70,7 @@ MODEL:
   
   spatial_output: False
   RGB_ENCODER:
-    output_size: 512
+    output_size: 1024
   DEPTH_ENCODER:
     output_size: 256    
   VISUAL_DIM:

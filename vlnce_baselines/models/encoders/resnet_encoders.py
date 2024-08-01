@@ -9,6 +9,7 @@ from habitat_baselines.rl.ddppo.policy import resnet
 from habitat_baselines.rl.ddppo.policy.resnet_policy import ResNetEncoder
 import torchvision
 import clip
+from transformers import Dinov2Backbone, AutoImageProcessor
 
 class VlnResnetDepthEncoder(nn.Module):
     def __init__(
@@ -255,10 +256,12 @@ class CLIPEncoder(nn.Module):
         self, device,
     ):
         super().__init__()
-        self.model, _ = clip.load("ViT-B/32", device=device)
+        #self.model, _ = clip.load("ViT-B/32", device=device)
+        self.model = Dinov2Backbone.from_pretrained("facebook/dinov2-large").cuda() #.eval()
         for param in self.model.parameters():
             param.requires_grad_(False)
         self.model.eval()
+        self.image_processor = AutoImageProcessor.from_pretrained("facebook/dinov2-large") # I think this just crops, we may need some other processing on the image size (multiple of patch size 14)
 
         from torchvision import transforms
         self.rgb_transform = torch.nn.Sequential(
@@ -271,8 +274,10 @@ class CLIPEncoder(nn.Module):
         on ImageNet. Sends through fully connected layer, activates, and
         returns final embedding.
         """
-        rgb_observations = observations["rgb"].permute(0, 3, 1, 2)
-        rgb_observations = self.rgb_transform(rgb_observations)
-        output = self.model.encode_image(rgb_observations.contiguous())
+        rgb_observations = observations["rgb"] #.permute(0, 3, 1, 2)
+        #rgb_observations = self.rgb_transform(rgb_observations)
+        rgb_observations = self.image_processor(rgb_observations, return_tensors='pt')['pixel_values'].to('cuda')
+        #output = self.model.encode_image(rgb_observations.contiguous())
+        output = self.model(rgb_observations.contiguous()).feature_maps[-1]
 
         return output.float() # to fp32
